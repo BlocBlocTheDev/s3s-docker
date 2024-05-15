@@ -1297,10 +1297,10 @@ def check_for_updates():
 
 
 def check_statink_key():
-    global api_key
-    if not api_key:
-        api_key = os.getenv('API_KEY')
-        if not api_key:
+    global API_KEY
+    if not API_KEY:
+        API_KEY = os.getenv('API_KEY')
+        if not API_KEY:
             print("No stat.ink API key found. Please set the API_KEY environment variable.")
             sys.exit(1)
 
