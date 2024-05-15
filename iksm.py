@@ -188,20 +188,13 @@ def log_in(ver, app_user_agent, f_gen_url):
 	print("\nNavigate to this URL in your browser:")
 	print(f'https://accounts.nintendo.com/connect/1.0.0/authorize?{urllib.parse.urlencode(body)}')
 
-	print("Log in, right click the \"Select this account\" button, copy the link address, and paste it below:")
-	while True:
-		try:
-			use_account_url = input("")
-			if use_account_url == "skip":
-				return "skip"
-			session_token_code = re.search('de=(.*)&st', use_account_url).group(1)
-			return get_session_token(session_token_code, auth_code_verifier)
-		except KeyboardInterrupt:
-			print("\nBye!")
-			sys.exit(1)
-		except AttributeError:
-			print("Malformed URL. Please try again, or press Ctrl+C to exit.")
-			print("URL:", end=' ')
+	use_account_url = os.getenv('USE_ACCOUNT_URL')
+	if not use_account_url:
+		print("No account URL found. Please set the USE_ACCOUNT_URL environment variable.")
+		sys.exit(1)
+		session_token_code = re.search('de=(.*)&st', use_account_url).group(1)
+	return get_session_token(session_token_code, auth_code_verifier)
+
 
 
 def get_session_token(session_token_code, auth_code_verifier):
