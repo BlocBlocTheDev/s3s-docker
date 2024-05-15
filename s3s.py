@@ -71,9 +71,9 @@ def write_config(tokens):
 	CONFIG_DATA = json.load(config_file)
 
 	global API_KEY
-	API_KEY = CONFIG_DATA["api_key"]
+	API_KEY = os.getenv('API_KEY')
 	global USER_LANG
-	USER_LANG = CONFIG_DATA["acc_loc"][:5]
+	USER_LANG = os.getenv('ACC_LOC')[:5]
 	global USER_COUNTRY
 	USER_COUNTRY = CONFIG_DATA["acc_loc"][-2:]
 	global GTOKEN
@@ -81,7 +81,7 @@ def write_config(tokens):
 	global BULLETTOKEN
 	BULLETTOKEN = CONFIG_DATA["bullettoken"]
 	global SESSION_TOKEN
-	SESSION_TOKEN = CONFIG_DATA["session_token"]
+	SESSION_TOKEN = os.getenv('SESSION_TOKEN')
 
 	config_file.close()
 
