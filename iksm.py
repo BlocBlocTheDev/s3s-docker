@@ -184,16 +184,16 @@ def log_in(ver, app_user_agent, f_gen_url):
 		'theme':                               'login_form'
 	}
 
-	print("\nMake sure you have read the \"Token generation\" section of the readme before proceeding. To manually input your tokens instead, enter \"skip\" at the prompt below.")
+	'''print("\nMake sure you have read the \"Token generation\" section of the readme before proceeding. To manually input your tokens instead, enter \"skip\" at the prompt below.")
 	print("\nNavigate to this URL in your browser:")
-	print(f'https://accounts.nintendo.com/connect/1.0.0/authorize?{urllib.parse.urlencode(body)}')
+	print(f'https://accounts.nintendo.com/connect/1.0.0/authorize?{urllib.parse.urlencode(body)}')'''
 
 	use_account_url = os.getenv('USE_ACCOUNT_URL')
-	if not use_account_url:
-		print("No account URL found. Please set the USE_ACCOUNT_URL environment variable.")
-		sys.exit(1)
-		session_token_code = re.search('de=(.*)&st', use_account_url).group(1)
-	return get_session_token(session_token_code, auth_code_verifier)
+    if not use_account_url:
+        print("No account URL found. Please set the USE_ACCOUNT_URL environment variable.")
+        sys.exit(1)
+    session_token_code = re.search('de=(.*)&st', use_account_url).group(1)
+    return get_session_token(session_token_code, auth_code_verifier)
 
 
 
