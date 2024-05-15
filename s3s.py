@@ -71,17 +71,17 @@ def write_config(tokens):
 	CONFIG_DATA = json.load(config_file)
 
 	global API_KEY
-	API_KEY = os.getenv('API_KEY')
+	API_KEY = CONFIG_DATA["api_key"]
 	global USER_LANG
-	USER_LANG = os.getenv('USER_LANG')[:5]
+	USER_LANG = CONFIG_DATA["acc_loc"][:5]
 	global USER_COUNTRY
-	USER_COUNTRY = os.getenv('USER_COUNTRY')[-2:]
+	USER_COUNTRY = CONFIG_DATA["acc_loc"][-2:]
 	global GTOKEN
 	GTOKEN = CONFIG_DATA["gtoken"]
 	global BULLETTOKEN
 	BULLETTOKEN = CONFIG_DATA["bullettoken"]
 	global SESSION_TOKEN
-	SESSION_TOKEN = os.getenv('SESSION_TOKEN')
+	SESSION_TOKEN = CONFIG_DATA["session_token"]
 
 	config_file.close()
 
@@ -1297,26 +1297,45 @@ def check_for_updates():
 
 
 def check_statink_key():
-    global API_KEY
-    if not API_KEY:
-        API_KEY = os.getenv('API_KEY')
-        if not API_KEY:
-            print("No stat.ink API key found. Please set the API_KEY environment variable.")
-            sys.exit(1)
+	'''Checks if a valid length API key has been provided and, if not, prompts the user to enter one.'''
 
+	if API_KEY == "skip":
+		return
+	elif len(API_KEY) != 43:
+		new_api_key = ""
+		while len(new_api_key.strip()) != 43 and new_api_key.strip() != "skip":
+			if new_api_key.strip() == "" and API_KEY.strip() == "":
+				new_api_key = input("stat.ink API key: ")
+			else:
+				print("Invalid stat.ink API key. Please re-enter it below.")
+				new_api_key = input("stat.ink API key: ")
+			CONFIG_DATA["api_key"] = new_api_key
+		write_config(CONFIG_DATA)
+	return
 
 
 def set_language():
-    global language_code
-    user_lang = os.getenv('USER_LANG')
-    user_country = os.getenv('USER_COUNTRY')
-    if user_lang and user_country:
-        language_code = f"{user_lang}-{user_country}|{user_country}"
-    else:
-        print("No language code found. Please set the USER_LANG and USER_COUNTRY environment variables.")
-        sys.exit(1)
+	'''Prompts the user to set their game language.'''
 
+	if USER_LANG == "":
+		print("Default locale is en-US. Press Enter to accept, or enter your own (see readme for list).")
+		language_code = input("")
 
+		if language_code == "":
+			CONFIG_DATA["acc_loc"] = "en-US|US" # default
+			write_config(CONFIG_DATA)
+			return
+		else:
+			language_list = [
+				"de-DE", "en-GB", "en-US", "es-ES", "es-MX", "fr-CA", "fr-FR",
+				"it-IT", "ja-JP", "ko-KR", "nl-NL", "ru-RU", "zh-CN", "zh-TW"
+			]
+			while language_code not in language_list:
+				print("Invalid language code. Please try entering it again:")
+				language_code = input("")
+			CONFIG_DATA["acc_loc"] = f"{language_code}|US" # default to US until set by ninty
+			write_config(CONFIG_DATA)
+	return
 
 
 def get_num_results(which):
