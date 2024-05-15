@@ -1297,21 +1297,13 @@ def check_for_updates():
 
 
 def check_statink_key():
-	'''Checks if a valid length API key has been provided and, if not, prompts the user to enter one.'''
+    global api_key
+    if not api_key:
+        api_key = os.getenv('API_KEY')
+        if not api_key:
+            print("No stat.ink API key found. Please set the API_KEY environment variable.")
+            sys.exit(1)
 
-	if API_KEY == "skip":
-		return
-	elif len(API_KEY) != 43:
-		new_api_key = ""
-		while len(new_api_key.strip()) != 43 and new_api_key.strip() != "skip":
-			if new_api_key.strip() == "" and API_KEY.strip() == "":
-				new_api_key = input("stat.ink API key: ")
-			else:
-				print("Invalid stat.ink API key. Please re-enter it below.")
-				new_api_key = input("stat.ink API key: ")
-			CONFIG_DATA["api_key"] = new_api_key
-		write_config(CONFIG_DATA)
-	return
 
 
 def set_language():
