@@ -1265,6 +1265,37 @@ def post_result(data, ismonitoring, isblackout, istestrun, overview_data=None):
 			print(f"{noun.capitalize()} uploaded to {headerloc}")
 
 
+def check_for_updates():
+	'''Checks the script version against the repo, reminding users to update if available.'''
+
+	try:
+		latest_script = requests.get("https://raw.githubusercontent.com/frozenpandaman/s3s/master/s3s.py")
+		new_version = re.search(r'A_VERSION = "([\d.]*)"', latest_script.text).group(1)
+		update_available = version.parse(new_version) > version.parse(A_VERSION)
+		if update_available:
+			print(f"\nThere is a new version (v{new_version}) available.", end='')
+			if os.path.isdir(".git"):
+				update_now = input("\nWould you like to update now? [Y/n] ")
+				if update_now == "" or update_now[0].lower() == "y":
+					FNULL = open(os.devnull, "w")
+					call(["git", "checkout", "."], stdout=FNULL, stderr=FNULL)
+					call(["git", "checkout", "master"], stdout=FNULL, stderr=FNULL)
+					call(["git", "pull"], stdout=FNULL, stderr=FNULL)
+					print(f"Successfully updated to v{new_version}. Please restart s3s.")
+					sys.exit(0)
+				else:
+					print("Please update to the latest version by running " \
+						'`\033[91m' + "git pull" + '\033[0m' \
+						"` as soon as possible.\n")
+			else: # no git directory
+				print(" Visit the site below to update:\nhttps://github.com/frozenpandaman/s3s\n")
+	except Exception as e: # if there's a problem connecting to github
+		print('\033[3m' + "» Couldn't connect to GitHub. Please update the script manually via " \
+			'`\033[91m' + "git pull" + '\033[0m' + "`." + '\033[0m' + "\n")
+		# print('\033[3m' + "» While s3s is in beta, please update the script regularly via " \
+		# 	'`\033[91m' + "git pull" + '\033[0m' + "`." + '\033[0m' + "\n")
+
+
 def check_statink_key():
 	'''Checks if a valid length API key has been provided and, if not, prompts the user to enter one.'''
 
@@ -1274,10 +1305,10 @@ def check_statink_key():
 		new_api_key = ""
 		while len(new_api_key.strip()) != 43 and new_api_key.strip() != "skip":
 			if new_api_key.strip() == "" and API_KEY.strip() == "":
-				new_api_key = os.getenv('API_STATINK')
+				new_api_key = input("stat.ink API key: ")
 			else:
 				print("Invalid stat.ink API key. Please re-enter it below.")
-				new_api_key = os.getenv('API_STATINK')
+				new_api_key = input("stat.ink API key: ")
 			CONFIG_DATA["api_key"] = new_api_key
 		write_config(CONFIG_DATA)
 	return
@@ -1288,7 +1319,7 @@ def set_language():
 
 	if USER_LANG == "":
 		print("Default locale is en-US. Press Enter to accept, or enter your own (see readme for list).")
-		language_code = os.getenv('LANG')
+		language_code = input("")
 
 		if language_code == "":
 			CONFIG_DATA["acc_loc"] = "en-US|US" # default
@@ -1301,7 +1332,7 @@ def set_language():
 			]
 			while language_code not in language_list:
 				print("Invalid language code. Please try entering it again:")
-				language_code = os.getenv('LANG')
+				language_code = input("")
 			CONFIG_DATA["acc_loc"] = f"{language_code}|US" # default to US until set by ninty
 			write_config(CONFIG_DATA)
 	return
@@ -1784,6 +1815,7 @@ def main():
 
 	# setup
 	#######
+	check_for_updates()
 	if not getseed:
 		check_statink_key()
 	set_language()

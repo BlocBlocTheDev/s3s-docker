@@ -191,7 +191,7 @@ def log_in(ver, app_user_agent, f_gen_url):
 	print("Log in, right click the \"Select this account\" button, copy the link address, and paste it below:")
 	while True:
 		try:
-			use_account_url = os.getenv('URL_SPLT')
+			use_account_url = input("")
 			if use_account_url == "skip":
 				return "skip"
 			session_token_code = re.search('de=(.*)&st', use_account_url).group(1)
