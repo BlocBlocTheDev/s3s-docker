@@ -26,20 +26,23 @@ elif __file__:
 	app_path = os.path.dirname(__file__)
 config_path = os.path.join(app_path, "config.txt")
 
-try:
-	config_file = open(config_path, "r")
-	CONFIG_DATA = json.load(config_file)
-	config_file.close()
-except (IOError, ValueError):
-	print("Generating new config file.")
-	CONFIG_DATA = {"api_key": "", "acc_loc": "", "gtoken": "", "bullettoken": "", "session_token": "", "f_gen": "https://api.imink.app/f"}
-	config_file = open(config_path, "w")
-	config_file.seek(0)
-	config_file.write(json.dumps(CONFIG_DATA, indent=4, sort_keys=False, separators=(',', ': ')))
-	config_file.close()
-	config_file = open(config_path, "r")
-	CONFIG_DATA = json.load(config_file)
-	config_file.close()
+CONFIG_DATA = {
+    "api_key": os.getenv('api_key'),
+    "acc_loc": os.getenv('acc_loc'),
+    "gtoken": os.getenv('gtoken'),
+    "bullettoken": os.getenv('bullettoken'),
+    "session_token": os.getenv('session_token'),
+    "f_gen": "https://api.imink.app/f"
+}
+
+# Ouvrez le fichier en mode écriture
+with open(config_path, "w") as config_file:
+    # Écrivez CONFIG_DATA dans le fichier
+    config_file.write(json.dumps(CONFIG_DATA, indent=4, sort_keys=False, separators=(',', ': ')))
+
+# Ouvrez le fichier en mode lecture pour vérifier les données
+with open(config_path, "r") as config_file:
+    CONFIG_DATA = json.load(config_file)
 
 # SET GLOBALS
 API_KEY       = CONFIG_DATA["api_key"]       # for stat.ink
