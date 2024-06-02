@@ -1,107 +1,220 @@
-s3s 🦑
+🦑 s3s + Docker 🐳
 =====
 
-**s3s** is a script that uploads _Splatoon 3_ battle data from the SplatNet 3 service (part of the Nintendo Switch Online app) to [stat.ink](https://stat.ink/), a site for recording, visualizing, and aggregating statistics from the *Splatoon* series of games.
+Fork from **[s3s](https://github.com/frozenpandaman/s3s)** by **[frozenpandaman](https://github.com/frozenpandaman)**.
 
-(ja) 日本語版セットアップ手順は[こちら](https://nerune-jp.com/splatoon3-statink/)、または[こちら](https://vanillasalt.net/2022/10/10/how-to-use-s3s/)。
+Edited for Docker Usage by **[BlocBlocTheBloc](https://github.com/BlocBlocTheDev)**
 
-(ko) 한국어 가이드는 [여기](https://github.com/cake-monotone/s3s)를 참조해 주세요.
+# FR :
 
-Looking to track your _Splatoon 2_ gameplay? See **[splatnet2statink](https://github.com/frozenpandaman/splatnet2statink)**.
+s3s est un script qui télécharge les données de bataille de Splatoon 3 depuis le service SplatNet 3 (une partie de l'application Nintendo Switch Online) vers stat.ink, un site pour enregistrer, visualiser et agréger les statistiques de la série de jeux Splatoon. Ce script fonctionne sur l'architecture Docker.
 
-### Features
- - [x] Full automation of SplatNet token generation via user log-in
- - [x] Ability to parse & upload complete battle/job stats to stat.ink ([example profile](https://stat.ink/@frozenpandaman/spl3))
- - [x] Support for Salmon Run Next Wave and Big Run
- - [x] Support for Splatfest & Tricolor Turf War battles and Challenges
- - [x] Monitoring for new results in real-time & checking for missing/unuploaded results
- - [x] Flag to remove other players' names from results
- - [x] Support for all available game languages
- - [x] File exporting function for use with Lean's [seed checker tools](https://leanny.github.io/splat3seedchecker/)
- - [x] Modular design to support [IkaLog3](https://github.com/hasegaw/IkaLog3) and other tools
+## Usage via Docker 🐳
 
-### What's coming?
- - [ ] Easier setup via downloadable, pre-packaged program executables (soon!)
+Outils nécessaires :
+1. Config.txt extrait de **[s3s](https://github.com/frozenpandaman/s3s)**
+2. Instance Docker fonctionnelle
+3. Portainer (Le tuto est fait pour Portainer mais marche aussi sans et sera différent)
 
----
+Les étapes nécessaires à l'utilisation de s3s via Docker
 
-## Usage 🐙
+### Étape 1 - Config.txt
+
+Pour faire fonctionner **[s3s-docker](https://github.com/BlocBlocTheDev/s3s-docker)**, vous devez d'abord avoir récupéré les informations de Config.txt après avoir lancé une première fois **[s3s](https://github.com/frozenpandaman/s3s)** sur votre ordinateur.
+
+**[s3s-docker](https://github.com/BlocBlocTheDev/s3s-docker)** ne permet pas de configurer les tokens de lui-même.
+
+Gardez bien ce fichier sur votre ordinateur.
+
+### Étape 2 - Créer une image
+
+Pour commencer, il vous faut créer une image Docker via un Dockerfile.
+
+Pour cela, rendez-vous dans les releases **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
+
+Téléchargez le Dockerfile de la version.
+
+Allez dans votre espace Portainer.
+
+Dans la catégorie Image, puis dans "Build a new Image".
+
+Dans le nom de l'image, mettez : "s3s:?".
+
+? sera à remplacer par le numéro de la dernière version disponible dans **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
+
+Puis, dans "Web editor", collez le contenu du Dockerfile téléchargé.
+
+Cliquez ensuite sur "Build the image".
+
+### Étape 3 - Configurer s3s
+
+Maintenant que vous avez votre image de s3s dans Docker, il faut la paramétrer.
+
+Allez dans la catégorie Stacks, puis cliquez sur "Add Stack".
+
+Donnez un nom à votre Stack, par exemple "s3s".
+
+Puis, dans "Web Editor", collez ce code :
+
 ```
-$ python s3s.py [-M [N]] [-r] [-nsr | -osr] [--blackout]
+version: '3'
+services:
+  s3s-docker:
+    container_name: S3S
+    image: s3s:[?]
+    environment:
+      - api_key=[VOTRE API KEY]
+      - acc_loc=[VOTRE RÉGION]
+      - gtoken=[VOTRE GTOKEN]
+      - bullettoken=[VOTRE BULLET TOKEN]
+      - session_token=[VOTRE SESSION TOKEN]
+    restart: unless-stopped
+
 ```
 
-The `-M` flag runs the script in monitoring mode, uploading new matches as you play, checking for new results every `N` seconds; if no `N` is provided, it defaults to 300 (5 minutes).
+Remplacez ensuite :
+- [?] -> Dernière version dans **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**
+- [VOTRE API KEY] -> La valeur entre "" de **api_key** dans **Config.txt**
+- [VOTRE RÉGION] -> La valeur entre "" de **acc_loc** dans **Config.txt**
+- [VOTRE GTOKEN] -> La valeur entre "" de **gtoken** dans **Config.txt**
+- [VOTRE BULLET TOKEN] -> La valeur entre "" de **bullettoken** dans **Config.txt**
+- [VOTRE SESSION TOKEN] -> La valeur entre "" de **session_token** dans **Config.txt**
 
-The `-r` flag checks for & uploads any battles/jobs present on SplatNet 3 that haven't yet been uploaded.
+Et cliquez sur "Deploy the Stack".
 
-The `-nsr` flag makes Salmon Run jobs **not** be monitored/uploaded. Use this if you're playing Lobby modes only.
+Vous aurez ensuite dans votre liste de "Containers" une ligne nommée "S3S" avec comme statut "running".
 
-The `-osr` flag, conversely, makes **only** Salmon Run jobs be monitored/uploaded. Use this if you're playing at Grizzco only.
+### Assistance
 
-The `--blackout` flag removes other players' names from uploaded scoreboard data.
+Si vous rencontrez des problèmes en souhaitant mettre en Docker votre s3s, reprenez le tutoriel avant de créer une **[Issue](https://github.com/BlocBlocTheDev/s3s-docker/issue)**.
 
-Arguments for advanced usage (e.g. locally exporting data to JSON files, use with with Lean's [seed checker tools](https://leanny.github.io/splat3seedchecker/)) can be viewed using `--help`.
+## Que fait le container ?
 
-### Tips for using s3s
+Quand votre container est déployé et fonctionne, voici ce qu'il se passe :
 
-★ **On first run**, you'll want to use the `-r` flag to upload _all_ available data from SplatNet to stat.ink, i.e. up to 250 battles (50 of each type: Turf War, Anarchy, X, Challenge, and Private) and up to 50 recent Salmon Run jobs.
+1. Vérifie si des matchs n'ont pas été importés sur Stat.ink (Si c'est le cas alors il les importe).
+2. Mise en mode passif, vérifie toutes les 5 minutes si de nouveaux matchs n'ont pas été importés (Si c'est le cas alors il les importe).
 
-The suggested usage of s3s is in monitoring mode, where you run the script as you play the game and exit it once you're done playing. The command **`python s3s.py -r -M`** first looks to ensure there's no data missing from stat.ink (uploading it if so), and then continues in monitoring mode while checking for new results every 5 minutes.
+## Suite du projet **[s3s-docker](https://github.com/BlocBlocTheDev/s3s-docker/)**
 
-More specific use cases can be specified using other flags (and [config keys](https://github.com/frozenpandaman/s3s/wiki/config-keys)). For example, if you're solely playing Salmon Run and only want to check for new results every 15 minutes, you would use `python s3s.py -osr -M 900`. If not using monitoring mode, `python s3s.py -r` should be run at least once every 50 matches to ensure no data is lost.
+Ce projet sera maintenu par **[BlocBlocTheBloc](https://github.com/BlocBlocTheDev)** pendant une durée indéterminée.
 
-## Setup instructions 🔰
+Checklist des futurs ajouts (Possible mais pas sûr) :
+- [] Option durée mode passif
 
-1. Download and install Python 3. On Windows, grab the latest release from [Python.org](https://www.python.org/downloads/windows/) and check the option during setup to add it to your PATH. On macOS, install [Homebrew](https://brew.sh/) and run `brew install python` from Terminal. Run `python --version` to verify the installation.
+Et bien d'autres...
 
-2. If you're on Windows, install [Git](https://git-scm.com/download/win) (pre-installed on macOS and Linux).
+## Déclaration de licence et de copyleft - Par **[frozenpandaman](https://github.com/frozenpandaman)**
 
-3. Download the script from the command line (macOS: Terminal; Windows: Command Prompt/PowerShell) by running `git clone https://github.com/frozenpandaman/s3s.git`.
+s3s est un _logiciel libre_ sous licence [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html). Cela signifie que vous avez la _liberté_ – d'exécuter, modifier, copier, partager et redistribuer ce travail comme bon vous semble, tant que les œuvres dérivées sont également distribuées sous ces mêmes termes ou des termes équivalents.
 
-4. Navigate to the newly-created directory (type `cd s3s/`) and install the required Python libraries by running `pip install -r requirements.txt`. On Windows, you may have to use `python -m pip` instead.
+Le droit d'auteur est une invention humaine récente, confuse et souvent inutile. Les bibliothèques, par exemple, existent depuis des milliers d'années, et leur rôle essentiel dans la "promotion de la science" et "l'encouragement de l'apprentissage" a été reconnu bien avant la promulgation des premiers statuts sur le droit d'auteur. Si le premier humain ayant eu l'idée d'un marteau l'avait revendiquée comme sa propriété intellectuelle, nous n'aurions pas progressé très loin en tant qu'espèce. Veuillez envisager de partager votre travail ouvertement avec le monde. _(déclaration adaptée de [ici](https://tspace.library.utoronto.ca/bitstream/1807/89456/1/Katz%20Copyright%2C%20Exhaustion.pdf) et [ici](https://rickey.info/about/))_
 
-5. Running the script for the first time (see the "Usage" section above [→](#usage-)) will prompt you to enter your stat.ink API Token (available in [settings](https://stat.ink/profile)). If you're playing the game in a language other than English, you may enter your language code (locale) as well.
+Bien qu'il s'agisse d'un projet libre et open-source, sa licence nécessite **une attribution**. **Si vous utilisez une partie de s3s, splatnet2statink, `iksm.py`, etc. dans votre projet, _veuillez fournir un lien vers ce dépôt_**. J'ai passé plus d'une demi-décennie et des centaines d'heures de mon temps personnel sur ces projets pour la communauté Splatoon – donc, au moins, un peu de crédit serait apprécié. :) Les dons, via le bouton "Sponsor" en haut ou les liens dans la barre latérale, sont également grandement appréciés. Merci, et restez frais ! –eli ＜コ:彡
 
-NOTE: Read the "Token generation" section below before proceeding. [→](#token-generation-)
+# ENG  - Partly from **[s3s README](https://github.com/frozenpandaman/s3s/blob/master/README.md)** :
 
-6. You will then be asked to navigate to a specific URL on Nintendo.com, log in, and follow simple instructions to obtain your `session_token`; this will be used to generate a `gtoken` and `bulletToken`. If you are opting against automatic token generation, enter "skip" for this step, at which point you will be asked to manually input your two tokens instead (see the [mitmproxy instructions](https://github.com/frozenpandaman/s3s/wiki/mitmproxy-instructions)).
+**s3s** is a script that uploads _Splatoon 3_ battle data from the SplatNet 3 service (part of the Nintendo Switch Online app) to **[stat.ink](https://stat.ink/)**, a site for recording, visualizing, and aggregating statistics from the *Splatoon* series of games. This script runs on Docker architecture.
 
-    These tokens (used to access your SplatNet battle results) along with your stat.ink API key & language will be saved into `config.txt` for you. You're now ready to upload battles!
+## Usage via Docker 🐳
 
-Have any questions, problems, or suggestions? [Create an issue](https://github.com/frozenpandaman/s3s/issues) here or contact me on [Twitter](https://twitter.com/frozenpandaman). **Please do not raise issues via Discord. It is important for discussion on the internet to be public, indexable, and searchable, able to be shared freely and benefit others – not locked behind a private platform. [Here](https://v21.io/blog/how-to-find-things-online)'s a great article about this!**
+Required tools:
+1. Config.txt extracted from **[s3s](https://github.com/frozenpandaman/s3s)**
+2. A functional Docker instance
+3. Portainer (The tutorial is made for Portainer but also works without it and will be different)
 
-質問があれば、ツイッター([@frozenpandaman](https://twitter.com/frozenpandaman))で連絡してください。日本語OK。
+Les étapes nécessaires à l'utilisation de s3s via Docker
 
-### Accessing SplatNet 3 from your browser
+### Step 1 - Config.txt
 
-If you wish to access SplatNet 3 from your computer rather than via the NSO phone app, or if you don't have a smartphone, follow [this s3s wiki article](https://github.com/frozenpandaman/s3s/wiki/in%E2%80%90browser-splatnet-3) to enable the use of SplatNet in-browser.
+To run **[s3s-docker](https://github.com/BlocBlocTheDev/s3s-docker)**, you must first have obtained the information from Config.txt after running **[s3s](https://github.com/frozenpandaman/s3s)** on your local computer for the first time.
 
-SplatNet 3 can be used in any available game language. You can even enter QR codes on the web version of the app via the list of available ones [here](https://github.com/frozenpandaman/s3s/wiki/list-of-qr-codes)!
+**[s3s-docker](https://github.com/BlocBlocTheDev/s3s-docker)** does not allow configuring the tokens by itself.
 
-*Splatoon 3* stage rotation information, Splatfest data, and current SplatNet gear are viewable at [splatoon3.ink](https://splatoon3.ink/).
+Keep this file on your computer.
 
-## Token generation 🪙
+### Step 2 - Create an image
 
-For s3s to work, [tokens](https://en.wikipedia.org/wiki/Access_token) known as `gtoken` and `bulletToken` are needed to access SplatNet. These tokens may be obtained automatically, using the script, or manually via the official Nintendo Switch Online app. Please read the following sections carefully to decide whether or not you want to use automatic token generation.
+To begin, you need to build a Docker image via a Dockerfile.
 
-### Automatic
+To do this, go to the releases **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
 
-Automatic token generation involves making a *secure request to a non-Nintendo server with minimal, non-identifying information*. We aim to be 100% transparent about this and provide in-depth information on security and privacy. Users who feel uncomfortable with this may opt to manually acquire their tokens instead.
+Download the Dockerfile of the version.
 
-**Privacy statement:** No identifying information is ever sent to the [imink API](https://status.imink.app/). Usernames and passwords are far removed from where the API comes into play and are never readable by anyone but you, and returned values do not contain any meaningful information about your account. It is not possible to use either sent or stored data to identify which account/user performed a request, to view identifying information about a user, or to gain access to an account. See the [imink API Privacy Policy](https://github.com/JoneWang/imink/wiki/Privacy-Policy) and [Documentation](https://github.com/JoneWang/imink/wiki/imink-API-Documentation) for more information.
+Go to your Portainer space.
 
-Alternatively, you can use [nsotokengen](https://github.com/clovervidia/nsotokengen) or [nxapi-znca-api](https://github.com/samuelthomas2774/nxapi-znca-api) as a drop-in replacement (customizable in `config.txt`) to generate tokens locally, i.e. without calls to a third-party API.
+In the Image category, then in "Build a new Image".
 
-### Manual
+In the image name, put: "s3s:?".
 
-Users who decide against using automatic token generation may instead retrieve tokens manually via SplatNet 3.
+? should be replaced by the latest version number available in **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
 
-In this case, users must obtain tokens from their phone – or an emulator – by intercepting their device's web traffic and entering the tokens into s3s when prompted (or manually adding them to `config.txt` later). Follow the [mitmproxy instructions](https://github.com/frozenpandaman/s3s/wiki/mitmproxy-instructions) to obtain your tokens. To opt for manual token entry, type "skip" when prompted to enter the "Select this account" URL.
+Then, in "Web editor", paste the content of the downloaded Dockerfile.
 
-## License & copyleft statement 🏴
+Then click on "Build the image".
 
-s3s is _free software_ licensed under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html). This means that you have _freedom_ – to run, modify, copy, share, and redistribute this work as you see fit, as long as derivative works are also distributed under these same or equivalent terms.
+### Step 3 - Configure s3s
 
-Copyright is a recent, confusing, and often unnecessary human invention. Libraries, for example, predate copyright by thousands of years, and their integral role in the "promotion of science" and "encouragement of learning" was acknowledged even before the first copyright statutes were enacted. If the first human who had the idea of a hammer claimed it as their intellectual property, we wouldn't have gotten very far as a species. Please consider sharing your work openly with the world. _(statement adapted from [here](https://tspace.library.utoronto.ca/bitstream/1807/89456/1/Katz%20Copyright%2C%20Exhaustion.pdf) and [here](https://rickey.info/about/))_
+Now that you have your s3s image in Docker, you need to configure it.
+
+Go to the Stacks category, then click on "Add Stack".
+
+Give a name to your Stack, for example, "s3s".
+
+Then, in "Web Editor", paste this code:
+
+```
+version: '3'
+services:
+  s3s-docker:
+    container_name: S3S
+    image: s3s:[?]
+    environment:
+      - api_key=[YOUR API KEY]
+      - acc_loc=[YOUR REGION]
+      - gtoken=[YOUR GTOKEN]
+      - bullettoken=[YOUR BULLET TOKEN]
+      - session_token=[YOUR SESSION TOKEN]
+    restart: unless-stopped
+
+```
+
+Remplacez ensuite :
+- [?] -> Latest version in **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**
+- [YOUR API KEY] -> The value between "" of **api_key** in **Config.txt**
+- [YOUR REGION] -> The value between "" of **acc_loc** in **Config.txt**
+- [YOUR GTOKEN] -> The value between "" of **gtoken** in **Config.txt**
+- [YOUR BULLET TOKEN] -> The value between "" of **bullettoken** in **Config.txt**
+- [YOUR SESSION TOKEN] -> The value between "" of **session_token** in **Config.txt**
+
+And click on "Deploy the Stack".
+
+You will then have a line named "S3S" in your "Containers" list with the status "running".
+
+### Assistance
+
+If you encounter problems when trying to Docker your s3s, review the tutorial before creating an **[Issue](https://github.com/BlocBlocTheDev/s3s-docker/issue)**.
+
+## What does the container do?
+
+When your container is deployed and running, here is what happens:
+
+1. Checks if matches have not been imported on Stat.ink (If so, then it imports them).
+2. Enters passive mode, checks every 5 minutes if new matches have not been imported (If so, then it imports them).
+
+## Future of the project **[s3s-docker](https://github.com/BlocBlocTheDev/s3s-docker/)**
+
+This project will be maintained by **[BlocBlocTheBloc](https://github.com/BlocBlocTheDev)** for an indefinite period.
+
+Checklist of future additions (Possible but not certain):
+- [] Passive mode duration option
+
+And many more...
+
+## License & copyleft statement - By **[frozenpandaman](https://github.com/frozenpandaman)**
+
+s3s is _free software_ licensed under **[GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)**. This means that you have _freedom_ – to run, modify, copy, share, and redistribute this work as you see fit, as long as derivative works are also distributed under these same or equivalent terms.
+
+Copyright is a recent, confusing, and often unnecessary human invention. Libraries, for example, predate copyright by thousands of years, and their integral role in the "promotion of science" and "encouragement of learning" was acknowledged even before the first copyright statutes were enacted. If the first human who had the idea of a hammer claimed it as their intellectual property, we wouldn't have gotten very far as a species. Please consider sharing your work openly with the world. _(statement adapted from **[here](https://tspace.library.utoronto.ca/bitstream/1807/89456/1/Katz%20Copyright%2C%20Exhaustion.pdf)** and **[here](https://rickey.info/about/)**)_
 
 While this is a free/libre and open-source project, its license does require **attribution**. **If you are using any part of s3s, splatnet2statink, `iksm.py`, etc. in your project, _please provide a link back to this repository_**. I have spent over half a decade and hundreds of hours of my personal time on these projects for the Splatoon community – so, at the least, some credit would be nice. :) Donations, via the "Sponsor" button at the top or links in the sidebar, are also greatly appreciated. Thank you, and stay fresh! –eli ＜コ:彡

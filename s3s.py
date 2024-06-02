@@ -1267,8 +1267,6 @@ def post_result(data, ismonitoring, isblackout, istestrun, overview_data=None):
 		else: # 200 OK
 			print(f"{noun.capitalize()} uploaded to {headerloc}")
 
-
-def check_for_updates():
 	'''Checks the script version against the repo, reminding users to update if available.'''
 
 	try:
@@ -1818,7 +1816,6 @@ def main():
 
 	# setup
 	#######
-	check_for_updates()
 	if not getseed:
 		check_statink_key()
 	set_language()
