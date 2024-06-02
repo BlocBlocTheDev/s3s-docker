@@ -61,7 +61,7 @@ version: '3'
 services:
   s3s-docker:
     container_name: S3S
-    image: s3s:[?]
+    image: blocblocthedev/s3s-docker:[?]
     environment:
       - api_key=[VOTRE API KEY]
       - acc_loc=[VOTRE RÉGION]
@@ -168,7 +168,7 @@ version: '3'
 services:
   s3s-docker:
     container_name: S3S
-    image: s3s:[?]
+    image: blocblocthedev/s3s-docker:[?]
     environment:
       - api_key=[YOUR API KEY]
       - acc_loc=[YOUR REGION]
