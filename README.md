@@ -14,7 +14,6 @@ s3s est un script qui télécharge les données de bataille de Splatoon 3 depuis
 Outils nécessaires :
 1. Config.txt extrait de **[s3s](https://github.com/frozenpandaman/s3s)**
 2. Instance Docker fonctionnelle
-3. Portainer (Le tuto est fait pour Portainer mais marche aussi sans et sera différent)
 
 Les étapes nécessaires à l'utilisation de s3s via Docker
 
@@ -26,27 +25,7 @@ Pour faire fonctionner **[s3s-docker](https://github.com/BlocBlocTheDev/s3s-dock
 
 Gardez bien ce fichier sur votre ordinateur.
 
-### Étape 2 - Créer une image
-
-Pour commencer, il vous faut créer une image Docker via un Dockerfile.
-
-Pour cela, rendez-vous dans les releases **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
-
-Téléchargez le Dockerfile de la version.
-
-Allez dans votre espace Portainer.
-
-Dans la catégorie Image, puis dans "Build a new Image".
-
-Dans le nom de l'image, mettez : "s3s:?".
-
-? sera à remplacer par le numéro de la dernière version disponible dans **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
-
-Puis, dans "Web editor", collez le contenu du Dockerfile téléchargé.
-
-Cliquez ensuite sur "Build the image".
-
-### Étape 3 - Configurer s3s
+### Étape 2 - Configurer s3s
 
 Maintenant que vous avez votre image de s3s dans Docker, il faut la paramétrer.
 
@@ -81,6 +60,8 @@ Remplacez ensuite :
 - [VOTRE SESSION TOKEN] -> La valeur entre "" de **session_token** dans **Config.txt**
 
 Et cliquez sur "Deploy the Stack".
+
+Vous pouvez aussi retrouvez le stack avec la version préremplis dans **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**
 
 Vous aurez ensuite dans votre liste de "Containers" une ligne nommée "S3S" avec comme statut "running".
 
@@ -121,9 +102,8 @@ Bien qu'il s'agisse d'un projet libre et open-source, sa licence nécessite **un
 Required tools:
 1. Config.txt extracted from **[s3s](https://github.com/frozenpandaman/s3s)**
 2. A functional Docker instance
-3. Portainer (The tutorial is made for Portainer but also works without it and will be different)
 
-Les étapes nécessaires à l'utilisation de s3s via Docker
+Steps necessary for using s3s via Docker
 
 ### Step 1 - Config.txt
 
@@ -133,27 +113,7 @@ To run **[s3s-docker](https://github.com/BlocBlocTheDev/s3s-docker)**, you must 
 
 Keep this file on your computer.
 
-### Step 2 - Create an image
-
-To begin, you need to build a Docker image via a Dockerfile.
-
-To do this, go to the releases **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
-
-Download the Dockerfile of the version.
-
-Go to your Portainer space.
-
-In the Image category, then in "Build a new Image".
-
-In the image name, put: "s3s:?".
-
-? should be replaced by the latest version number available in **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**.
-
-Then, in "Web editor", paste the content of the downloaded Dockerfile.
-
-Then click on "Build the image".
-
-### Step 3 - Configure s3s
+### Step 2 - Configure s3s
 
 Now that you have your s3s image in Docker, you need to configure it.
 
@@ -188,6 +148,8 @@ Remplacez ensuite :
 - [YOUR SESSION TOKEN] -> The value between "" of **session_token** in **Config.txt**
 
 And click on "Deploy the Stack".
+
+You can also find the stack with the pre-filled version in **[s3s-docker releases](https://github.com/BlocBlocTheDev/s3s-docker/releases)**
 
 You will then have a line named "S3S" in your "Containers" list with the status "running".
 
