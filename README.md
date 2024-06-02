@@ -5,6 +5,8 @@ Fork from **[s3s](https://github.com/frozenpandaman/s3s)** by **[frozenpandaman]
 
 Edited for Docker Usage by **[BlocBlocTheBloc](https://github.com/BlocBlocTheDev)**
 
+**[DockerHub page](https://hub.docker.com/r/blocblocthedev/s3s-docker)**
+
 # FR :
 
 s3s est un script qui télécharge les données de bataille de Splatoon 3 depuis le service SplatNet 3 (une partie de l'application Nintendo Switch Online) vers stat.ink, un site pour enregistrer, visualiser et agréger les statistiques de la série de jeux Splatoon. Ce script fonctionne sur l'architecture Docker.
